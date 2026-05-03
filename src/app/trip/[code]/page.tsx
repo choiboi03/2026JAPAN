@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = "edge";
+
 import { use, useMemo } from "react";
 import { Loader2 } from "lucide-react";
 import TripHeader from "@/components/TripHeader";

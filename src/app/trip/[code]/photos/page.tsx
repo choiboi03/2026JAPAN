@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = "edge";
+
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { Camera, Loader2, Trash2, Upload, X } from "lucide-react";
 import TripHeader from "@/components/TripHeader";

@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = "edge";
+
 import { use, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Pause, Play, Share2, ChevronLeft, ChevronRight } from "lucide-react";
