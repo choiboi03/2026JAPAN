@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { Plus, GripVertical, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import type { Block, Candidate, CandidateType } from "@/lib/types";
 import CandidateCard from "./CandidateCard";
 import { getSupabase } from "@/lib/supabase";
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function BlockCarousel({ block, candidates, tripCode, onChanged }: Props) {
-  const [emblaRef, embla] = useEmblaCarousel({ align: "center", containScroll: "trimSnaps" });
+  const [emblaRef, embla] = useEmblaCarousel({ align: "start", containScroll: "trimSnaps" });
   const [selected, setSelected] = useState(0);
   const [me] = useMe(tripCode);
 
@@ -88,25 +88,10 @@ export default function BlockCarousel({ block, candidates, tripCode, onChanged }
 
   return (
     <div className="group relative">
-      <div className="mb-2 flex items-center justify-between px-1">
-        <div className="flex items-center gap-1.5 text-[11px] text-neutral-400">
-          <GripVertical className="h-3 w-3" />
-          <span>
-            후보 {selected + 1} / {candidates.length}
-          </span>
-        </div>
-        <button
-          onClick={deleteBlock}
-          className="rounded-full p-1 text-neutral-300 opacity-0 transition group-hover:opacity-100 hover:text-red-500"
-          title="블록 삭제"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
-      </div>
       <div className="embla -mx-1" ref={emblaRef}>
         <div className="embla__container gap-3 px-1">
           {candidates.map((c) => (
-            <div key={c.id} className="embla__slide">
+            <div key={c.id} className="embla__slide" style={{ flex: "0 0 88%" }}>
               <CandidateCard
                 candidate={c}
                 selected={c.id === block.selected_candidate_id}
@@ -115,7 +100,7 @@ export default function BlockCarousel({ block, candidates, tripCode, onChanged }
               />
             </div>
           ))}
-          <div className="embla__slide">
+          <div className="embla__slide" style={{ flex: "0 0 88%" }}>
             <div className="flex h-full min-h-[120px] items-center justify-center rounded-2xl border-2 border-dashed border-neutral-200 bg-white/40 p-4">
               <AddCandidateButtons onAdd={addCandidate} compact />
             </div>
