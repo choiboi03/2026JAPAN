@@ -168,7 +168,7 @@ export default function Home() {
                 type="date"
                 value={start}
                 onChange={(e) => setStart(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-3 outline-none focus:border-sakura-400 focus:bg-white"
+                className="mt-1 block h-12 w-full appearance-none rounded-xl border border-neutral-200 bg-neutral-50 px-3 text-left text-base outline-none focus:border-sakura-400 focus:bg-white"
               />
             </label>
             <label className="block">
@@ -177,7 +177,7 @@ export default function Home() {
                 type="date"
                 value={end}
                 onChange={(e) => setEnd(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-3 outline-none focus:border-sakura-400 focus:bg-white"
+                className="mt-1 block h-12 w-full appearance-none rounded-xl border border-neutral-200 bg-neutral-50 px-3 text-left text-base outline-none focus:border-sakura-400 focus:bg-white"
               />
             </label>
           </div>

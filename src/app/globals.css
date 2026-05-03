@@ -26,3 +26,27 @@ body {
 .embla { overflow: hidden; }
 .embla__container { display: flex; }
 .embla__slide { flex: 0 0 100%; min-width: 0; }
+
+/* iOS Safari normalizes for date/time inputs:
+   - prevent the auto-zoom on focus (requires >= 16px)
+   - left-align the displayed value
+   - drop default native chrome that breaks our rounded look */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  -webkit-appearance: none;
+  appearance: none;
+  font-size: 16px;
+  text-align: left;
+  line-height: 1.2;
+  background-color: transparent;
+}
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 0.5;
+  margin-left: auto;
+}
