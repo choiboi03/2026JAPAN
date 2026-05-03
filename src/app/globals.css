@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  height: 100%;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+body {
+  background: linear-gradient(180deg, #fff5f7 0%, #fafafa 100%);
+  color: #1a1a1a;
+  font-feature-settings: "ss01", "cv11";
+}
+
+/* Hide scrollbars on horizontal candidate sliders for a cleaner mobile look */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Embla carousel base styles */
+.embla { overflow: hidden; }
+.embla__container { display: flex; }
+.embla__slide { flex: 0 0 100%; min-width: 0; }
