@@ -2,7 +2,7 @@
 
 export const runtime = "edge";
 
-import { use, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Pause, Play, Share2, ChevronLeft, ChevronRight } from "lucide-react";
 import TripHeader from "@/components/TripHeader";
@@ -23,8 +23,8 @@ interface Slide {
 
 const SLIDE_MS = 4500;
 
-export default function SummaryPage({ params }: { params: Promise<{ code: string }> }) {
-  const { code } = use(params);
+export default function SummaryPage({ params }: { params: { code: string } }) {
+  const { code } = params;
   const [trip, setTrip] = useState<Trip | null>(null);
   const [days, setDays] = useState<Day[]>([]);
   const [blocks, setBlocks] = useState<Block[]>([]);

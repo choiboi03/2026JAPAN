@@ -2,7 +2,7 @@
 
 export const runtime = "edge";
 
-import { use, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Camera, Loader2, Trash2, Upload, X } from "lucide-react";
 import TripHeader from "@/components/TripHeader";
 import NamePrompt from "@/components/NamePrompt";
@@ -10,8 +10,8 @@ import { getSupabase, PHOTO_BUCKET } from "@/lib/supabase";
 import { useMe } from "@/lib/me";
 import type { Photo, Trip } from "@/lib/types";
 
-export default function PhotosPage({ params }: { params: Promise<{ code: string }> }) {
-  const { code } = use(params);
+export default function PhotosPage({ params }: { params: { code: string } }) {
+  const { code } = params;
   const [trip, setTrip] = useState<Trip | null>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);

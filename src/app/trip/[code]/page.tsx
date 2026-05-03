@@ -2,7 +2,7 @@
 
 export const runtime = "edge";
 
-import { use, useMemo } from "react";
+import { useMemo } from "react";
 import { Loader2 } from "lucide-react";
 import TripHeader from "@/components/TripHeader";
 import DaySection from "@/components/DaySection";
@@ -10,8 +10,8 @@ import NamePrompt from "@/components/NamePrompt";
 import { useTripData } from "@/lib/useTripData";
 import type { Candidate } from "@/lib/types";
 
-export default function TripPage({ params }: { params: Promise<{ code: string }> }) {
-  const { code } = use(params);
+export default function TripPage({ params }: { params: { code: string } }) {
+  const { code } = params;
   const { trip, days, blocks, candidates, loading, error, reload } = useTripData(code);
 
   const candidatesByBlock = useMemo(() => {
