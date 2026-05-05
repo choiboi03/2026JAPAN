@@ -50,7 +50,7 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
 
   if (editing) {
     return (
-      <div className={`relative rounded-2xl border-2 ${meta.color} p-4`}>
+      <div className={`relative rounded-2xl border-2 ${meta.color} px-4 pb-7 pt-4`}>
         <div className="mb-2 flex gap-1">
           {(["move", "place", "other"] as CandidateType[]).map((t) => {
             const m = CANDIDATE_TYPE_META[t];
@@ -119,7 +119,7 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
 
   return (
     <div
-      className={`relative rounded-2xl border-2 ${meta.color} p-4 transition ${
+      className={`relative rounded-2xl border-2 ${meta.color} px-4 pb-7 pt-4 transition ${
         selected ? `ring-2 ${meta.ring}` : "opacity-90"
       }`}
     >

@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, GripVertical } from "lucide-react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import type { Block, Candidate, CandidateType } from "@/lib/types";
 import CandidateCard from "./CandidateCard";
 import { getSupabase } from "@/lib/supabase";
@@ -16,6 +18,14 @@ interface Props {
 }
 
 export default function BlockCarousel({ block, candidates, tripCode, onChanged }: Props) {
+  const sortable = useSortable({ id: block.id });
+  const sortStyle: React.CSSProperties = {
+    transform: CSS.Transform.toString(sortable.transform),
+    transition: sortable.transition,
+    opacity: sortable.isDragging ? 0.6 : 1,
+    zIndex: sortable.isDragging ? 30 : undefined
+  };
+
   const [emblaRef, embla] = useEmblaCarousel({ align: "start", containScroll: "trimSnaps" });
   const [selected, setSelected] = useState(0);
   const [me] = useMe(tripCode);
@@ -30,7 +40,6 @@ export default function BlockCarousel({ block, candidates, tripCode, onChanged }
     };
   }, [embla, candidates.length]);
 
-  // Snap to selected_candidate_id when it changes
   useEffect(() => {
     if (!embla || !block.selected_candidate_id) return;
     const idx = candidates.findIndex((c) => c.id === block.selected_candidate_id);
@@ -51,7 +60,6 @@ export default function BlockCarousel({ block, candidates, tripCode, onChanged }
       })
       .select("id")
       .single();
-    // If first candidate, auto-select it
     if (nextPos === 0 && data) {
       await sb.from("blocks").update({ selected_candidate_id: data.id }).eq("id", block.id);
     }
@@ -72,53 +80,73 @@ export default function BlockCarousel({ block, candidates, tripCode, onChanged }
     onChanged();
   }
 
+  const dragHandle = (
+    <button
+      ref={sortable.setActivatorNodeRef}
+      {...sortable.attributes}
+      {...sortable.listeners}
+      aria-label="블록 순서 변경 (꾹 누른 채 드래그)"
+      className="flex shrink-0 cursor-grab touch-none items-center self-stretch px-0.5 text-neutral-300 transition active:cursor-grabbing active:text-neutral-700"
+    >
+      <GripVertical className="h-5 w-5" />
+    </button>
+  );
+
   if (candidates.length === 0) {
     return (
-      <div className="rounded-2xl border-2 border-dashed border-neutral-200 bg-white/40 p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <span className="text-xs font-semibold text-neutral-400">새 블록</span>
-          <button onClick={deleteBlock} className="rounded-full p-1 text-neutral-300 hover:text-red-500">
-            <Trash2 className="h-4 w-4" />
-          </button>
+      <div ref={sortable.setNodeRef} style={sortStyle} className="flex items-stretch gap-1">
+        {dragHandle}
+        <div className="flex-1 rounded-2xl border-2 border-dashed border-neutral-200 bg-white/40 p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-xs font-semibold text-neutral-400">새 블록</span>
+            <button onClick={deleteBlock} className="rounded-full p-1 text-neutral-300 hover:text-red-500">
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+          <AddCandidateButtons onAdd={addCandidate} />
         </div>
-        <AddCandidateButtons onAdd={addCandidate} />
       </div>
     );
   }
 
   return (
-    <div className="group relative">
-      <div className="embla -mx-1" ref={emblaRef}>
-        <div className="embla__container gap-3 px-1">
-          {candidates.map((c) => (
-            <div key={c.id} className="embla__slide" style={{ flex: "0 0 88%" }}>
-              <CandidateCard
-                candidate={c}
-                selected={c.id === block.selected_candidate_id}
-                onSelect={() => selectCandidate(c.id)}
-                onChanged={onChanged}
-              />
-            </div>
-          ))}
-          <div className="embla__slide" style={{ flex: "0 0 88%" }}>
-            <div className="flex h-full min-h-[120px] items-center justify-center rounded-2xl border-2 border-dashed border-neutral-200 bg-white/40 p-4">
-              <AddCandidateButtons onAdd={addCandidate} compact />
+    <div ref={sortable.setNodeRef} style={sortStyle} className="flex items-stretch gap-1">
+      {dragHandle}
+      <div className="relative min-w-0 flex-1">
+        <div className="embla -mx-1" ref={emblaRef}>
+          <div className="embla__container gap-3 px-1">
+            {candidates.map((c) => (
+              <div key={c.id} className="embla__slide" style={{ flex: "0 0 88%" }}>
+                <CandidateCard
+                  candidate={c}
+                  selected={c.id === block.selected_candidate_id}
+                  onSelect={() => selectCandidate(c.id)}
+                  onChanged={onChanged}
+                />
+              </div>
+            ))}
+            <div className="embla__slide" style={{ flex: "0 0 88%" }}>
+              <div className="flex h-full min-h-[120px] items-center justify-center rounded-2xl border-2 border-dashed border-neutral-200 bg-white/40 p-4">
+                <AddCandidateButtons onAdd={addCandidate} compact />
+              </div>
             </div>
           </div>
         </div>
+        {candidates.length > 1 && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center">
+            <div className="flex items-center gap-1 rounded-full bg-black/55 px-2 py-1 backdrop-blur-sm">
+              {candidates.map((c, i) => (
+                <span
+                  key={c.id}
+                  className={`h-1.5 rounded-full transition-all ${
+                    i === selected ? "w-4 bg-white" : "w-1.5 bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-      {candidates.length > 0 && (
-        <div className="mt-2 flex justify-center gap-1">
-          {candidates.map((c, i) => (
-            <span
-              key={c.id}
-              className={`h-1.5 rounded-full transition-all ${
-                i === selected ? "w-5 bg-neutral-900" : "w-1.5 bg-neutral-300"
-              }`}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

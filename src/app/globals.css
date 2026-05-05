@@ -7,13 +7,13 @@
 }
 
 html, body {
-  height: 100%;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }
 
 body {
-  background: linear-gradient(180deg, #fff5f7 0%, #fafafa 100%);
+  min-height: 100vh;
+  background: linear-gradient(180deg, #fff5f7 0%, #fafafa 100%) fixed;
   color: #1a1a1a;
   font-feature-settings: "ss01", "cv11";
 }
