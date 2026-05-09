@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "2026 Japan — Trip Planner",
-  description: "친구 셋이서 같이 짜는 일본 여행 플래너",
+  title: "wetrip — 친구들과 함께 짜는 여행 플래너",
+  description: "여행 코드 하나로 친구들과 같이 일정을 블록으로 짜고, 사진을 모으고, 자동 스토리로 추억을 남기세요.",
   manifest: "/manifest.webmanifest"
 };
 

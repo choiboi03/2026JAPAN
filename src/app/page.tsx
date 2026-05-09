@@ -93,8 +93,8 @@ export default function Home() {
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-sakura-500 text-white shadow-lg shadow-sakura-200">
           <Plane className="h-7 w-7" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight">2026 일본 여행</h1>
-        <p className="mt-1 text-sm text-neutral-500">친구들과 함께 짜는 블록 플래너</p>
+        <h1 className="text-3xl font-bold tracking-tight">wetrip</h1>
+        <p className="mt-1 text-sm text-neutral-500">친구들과 함께 짜는 블록 여행 플래너</p>
       </header>
 
       {!isSupabaseConfigured && (
