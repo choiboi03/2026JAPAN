@@ -28,7 +28,7 @@ export default function TripHeader({ trip }: Props) {
   ];
 
   return (
-    <header className="sticky top-0 z-30 border-b border-black/5 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-black/5 bg-white">
       <div className="mx-auto flex max-w-md items-center gap-2 px-4 py-3">
         <Link href="/" className="rounded-full p-1.5 text-neutral-500 hover:bg-neutral-100">
           <ArrowLeft className="h-5 w-5" />

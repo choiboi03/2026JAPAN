@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -19,18 +19,33 @@ import { getSupabase } from "@/lib/supabase";
 interface Props {
   day: Day;
   index: number;
+  totalDays: number;
   tripCode: string;
   blocks: Block[];
   candidatesByBlock: Map<string, Candidate[]>;
   onChanged: () => void;
+  onPrevDay: () => void;
+  onNextDay: () => void;
 }
 
-export default function DaySection({ day, index, tripCode, blocks, candidatesByBlock, onChanged }: Props) {
-  // PointerSensor: desktop click+drag.  TouchSensor with delay = mobile long-press to drag.
+export default function DaySection({
+  day,
+  index,
+  totalDays,
+  tripCode,
+  blocks,
+  candidatesByBlock,
+  onChanged,
+  onPrevDay,
+  onNextDay
+}: Props) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } })
   );
+
+  const canGoPrev = index > 0;
+  const canGoNext = index < totalDays - 1;
 
   async function addBlock() {
     const sb = getSupabase();
@@ -54,12 +69,37 @@ export default function DaySection({ day, index, tripCode, blocks, candidatesByB
 
   return (
     <section className="space-y-3">
-      <div className="sticky top-[81px] z-20 -mx-4 bg-white/95 px-4 py-2.5 shadow-sm ring-1 ring-black/5 backdrop-blur">
-        <div className="flex items-baseline gap-2">
-          <span className="rounded-full bg-ocean-100 px-2 py-0.5 text-[10px] font-bold tracking-wider text-ocean-700">
-            DAY {index + 1}
-          </span>
-          <h2 className="text-base font-bold tracking-tight">{formatDateKo(day.date)}</h2>
+      <div className="sticky top-[81px] z-20 -mx-4 bg-white px-2 py-2 shadow-sm ring-1 ring-black/5">
+        <div className="flex items-center justify-between gap-2">
+          <button
+            onClick={onPrevDay}
+            disabled={!canGoPrev}
+            aria-label="이전 날"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-neutral-700 transition hover:bg-neutral-100 active:scale-95 disabled:text-neutral-300 disabled:hover:bg-transparent"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <div className="flex min-w-0 flex-1 flex-col items-center justify-center text-center">
+            <div className="flex items-baseline gap-2">
+              <span className="rounded-full bg-ocean-100 px-2 py-0.5 text-[10px] font-bold tracking-wider text-ocean-700">
+                DAY {index + 1}
+              </span>
+              <h2 className="truncate text-base font-bold tracking-tight">
+                {formatDateKo(day.date)}
+              </h2>
+            </div>
+            <span className="text-[10px] text-neutral-400">
+              {index + 1} / {totalDays}
+            </span>
+          </div>
+          <button
+            onClick={onNextDay}
+            disabled={!canGoNext}
+            aria-label="다음 날"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-neutral-700 transition hover:bg-neutral-100 active:scale-95 disabled:text-neutral-300 disabled:hover:bg-transparent"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
         </div>
       </div>
 
