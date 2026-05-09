@@ -76,7 +76,7 @@ export default function SummaryPage({ params }: { params: { code: string } }) {
       title: trip.title,
       subtitle: `${trip.start_date} ~ ${trip.end_date}`,
       photoUrl: photos[0] ? url(photos[0].storage_path) : undefined,
-      color: trip.cover_color ?? "#f43f6a"
+      color: trip.cover_color ?? "#0ea5e9"
     });
 
     const photosByDay = new Map<string, Photo[]>();
@@ -140,7 +140,7 @@ export default function SummaryPage({ params }: { params: { code: string } }) {
       kind: "outro",
       title: "수고했어요!",
       subtitle: `${days.length}일 · ${photos.length}장의 추억`,
-      color: trip.cover_color ?? "#f43f6a"
+      color: trip.cover_color ?? "#0ea5e9"
     });
     return out;
   }, [trip, days, blocks, candidates, photos]);
@@ -163,7 +163,7 @@ export default function SummaryPage({ params }: { params: { code: string } }) {
   if (loading || !trip) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-sakura-500" />
+        <Loader2 className="h-6 w-6 animate-spin text-ocean-500" />
       </div>
     );
   }
@@ -230,7 +230,7 @@ export default function SummaryPage({ params }: { params: { code: string } }) {
                 <div
                   className="h-full w-full"
                   style={{
-                    background: `linear-gradient(135deg, ${slide.color ?? "#f43f6a"} 0%, #1a1a1a 100%)`
+                    background: `linear-gradient(135deg, ${slide.color ?? "#0ea5e9"} 0%, #1a1a1a 100%)`
                   }}
                 />
               )}
@@ -243,7 +243,7 @@ export default function SummaryPage({ params }: { params: { code: string } }) {
                   </span>
                 )}
                 {slide.kind === "day-intro" && (
-                  <div className="text-sakura-300 text-sm font-bold tracking-widest">{slide.title}</div>
+                  <div className="text-ocean-300 text-sm font-bold tracking-widest">{slide.title}</div>
                 )}
                 {slide.title && slide.kind !== "day-intro" && (
                   <h2 className="text-2xl font-bold leading-tight drop-shadow">{slide.title}</h2>
@@ -270,7 +270,7 @@ export default function SummaryPage({ params }: { params: { code: string } }) {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPlaying((p) => !p)}
-              className="rounded-full bg-sakura-500 p-3 text-white shadow-md shadow-sakura-200"
+              className="rounded-full bg-ocean-500 p-3 text-white shadow-md shadow-ocean-200"
             >
               {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
             </button>

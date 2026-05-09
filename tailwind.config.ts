@@ -8,15 +8,15 @@ const config: Config = {
         sans: ["ui-sans-serif", "system-ui", "-apple-system", "Pretendard", "Noto Sans KR", "sans-serif"]
       },
       colors: {
-        sakura: {
-          50: "#fff5f7",
-          100: "#ffe4ea",
-          200: "#ffc1ce",
-          300: "#ff97ad",
-          400: "#ff6b8a",
-          500: "#f43f6a",
-          600: "#d72654",
-          700: "#b21945"
+        ocean: {
+          50: "#f0f9ff",
+          100: "#e0f2fe",
+          200: "#bae6fd",
+          300: "#7dd3fc",
+          400: "#38bdf8",
+          500: "#0ea5e9",
+          600: "#0284c7",
+          700: "#0369a1"
         }
       },
       animation: {

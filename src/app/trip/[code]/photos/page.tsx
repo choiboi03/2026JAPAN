@@ -105,7 +105,7 @@ export default function PhotosPage({ params }: { params: { code: string } }) {
   if (loading || !trip) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-sakura-500" />
+        <Loader2 className="h-6 w-6 animate-spin text-ocean-500" />
       </div>
     );
   }
@@ -146,7 +146,7 @@ export default function PhotosPage({ params }: { params: { code: string } }) {
                 }
               }}
               disabled={uploading}
-              className="flex items-center justify-center gap-2 rounded-xl bg-sakura-500 py-3 font-semibold text-white shadow-md shadow-sakura-200 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-xl bg-ocean-500 py-3 font-semibold text-white shadow-md shadow-ocean-200 disabled:opacity-50"
             >
               <Camera className="h-4 w-4" />
               지금 촬영
@@ -161,7 +161,7 @@ export default function PhotosPage({ params }: { params: { code: string } }) {
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-neutral-100">
                 <div
-                  className="h-full bg-sakura-500 transition-all"
+                  className="h-full bg-ocean-500 transition-all"
                   style={{ width: `${progress}%` }}
                 />
               </div>

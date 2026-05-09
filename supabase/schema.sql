@@ -15,7 +15,7 @@ create table if not exists public.trips (
   title       text not null default '일본 여행',
   start_date  date,
   end_date    date,
-  cover_color text default '#f43f6a',
+  cover_color text default '#0ea5e9',
   created_at  timestamptz not null default now()
 );
 
@@ -99,7 +99,7 @@ create table if not exists public.participants (
   id        uuid primary key default gen_random_uuid(),
   trip_id   uuid not null references public.trips(id) on delete cascade,
   name      text not null,
-  color     text not null default '#f43f6a',
+  color     text not null default '#0ea5e9',
   joined_at timestamptz not null default now(),
   unique (trip_id, name)
 );

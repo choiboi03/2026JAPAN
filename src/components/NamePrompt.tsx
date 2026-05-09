@@ -44,12 +44,12 @@ export default function NamePrompt({ tripId, tripCode, onJoined, children }: Pro
           onChange={(e) => setName(e.target.value)}
           placeholder="예: 지민"
           maxLength={12}
-          className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-lg outline-none focus:border-sakura-400 focus:bg-white"
+          className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-lg outline-none focus:border-ocean-400 focus:bg-white"
         />
         <button
           type="submit"
           disabled={busy || !name.trim()}
-          className="w-full rounded-xl bg-sakura-500 py-3 font-semibold text-white shadow-md shadow-sakura-200 disabled:opacity-50"
+          className="w-full rounded-xl bg-ocean-500 py-3 font-semibold text-white shadow-md shadow-ocean-200 disabled:opacity-50"
         >
           시작하기
         </button>
