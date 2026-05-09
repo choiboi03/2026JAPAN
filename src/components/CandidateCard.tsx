@@ -13,10 +13,25 @@ interface Props {
   onChanged: () => void;
 }
 
+interface MoveMeta {
+  from?: string;
+  to?: string;
+}
+
+function getMove(meta: Record<string, unknown>): MoveMeta {
+  return {
+    from: typeof meta.from === "string" ? meta.from : "",
+    to: typeof meta.to === "string" ? meta.to : ""
+  };
+}
+
 export default function CandidateCard({ candidate, selected, onSelect, onChanged }: Props) {
   const meta = CANDIDATE_TYPE_META[candidate.type];
+  const initialMove = getMove(candidate.meta);
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(candidate.title);
+  const [fromLoc, setFromLoc] = useState(initialMove.from ?? "");
+  const [toLoc, setToLoc] = useState(initialMove.to ?? "");
   const [desc, setDesc] = useState(candidate.description ?? "");
   const [type, setType] = useState<CandidateType>(candidate.type);
   const [start, setStart] = useState(candidate.start_time ?? "");
@@ -26,14 +41,24 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
   async function save() {
     setBusy(true);
     const sb = getSupabase();
+    const isMove = type === "move";
+    const computedTitle = isMove
+      ? [fromLoc.trim(), toLoc.trim()].filter(Boolean).join(" ➡️ ")
+      : title.trim();
+    const nextMeta: Record<string, unknown> = { ...candidate.meta };
+    if (isMove) {
+      nextMeta.from = fromLoc.trim();
+      nextMeta.to = toLoc.trim();
+    }
     await sb
       .from("candidates")
       .update({
         type,
-        title: title.trim(),
+        title: computedTitle,
         description: desc.trim() || null,
         start_time: start || null,
-        end_time: end || null
+        end_time: end || null,
+        meta: nextMeta
       })
       .eq("id", candidate.id);
     setBusy(false);
@@ -50,7 +75,7 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
 
   if (editing) {
     return (
-      <div className={`relative rounded-2xl border-2 ${meta.color} px-4 pb-7 pt-4`}>
+      <div className={`relative w-full overflow-hidden rounded-2xl border-2 ${meta.color} px-4 pb-7 pt-4`}>
         <div className="mb-2 flex gap-1">
           {(["move", "place", "other"] as CandidateType[]).map((t) => {
             const m = CANDIDATE_TYPE_META[t];
@@ -68,12 +93,37 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
             );
           })}
         </div>
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="제목"
-          className="mb-2 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none"
-        />
+
+        {type === "move" ? (
+          <div className="mb-2 space-y-2">
+            <label className="flex items-center gap-2">
+              <span className="w-10 text-xs font-semibold text-neutral-500">출발</span>
+              <input
+                value={fromLoc}
+                onChange={(e) => setFromLoc(e.target.value)}
+                placeholder="예: 인천공항"
+                className="w-full min-w-0 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none"
+              />
+            </label>
+            <label className="flex items-center gap-2">
+              <span className="w-10 text-xs font-semibold text-neutral-500">도착</span>
+              <input
+                value={toLoc}
+                onChange={(e) => setToLoc(e.target.value)}
+                placeholder="예: 나리타공항"
+                className="w-full min-w-0 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none"
+              />
+            </label>
+          </div>
+        ) : (
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="제목"
+            className="mb-2 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none"
+          />
+        )}
+
         <div className="mb-2 grid grid-cols-2 gap-2">
           <input
             type="time"
@@ -119,7 +169,7 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
 
   return (
     <div
-      className={`relative rounded-2xl border-2 ${meta.color} px-4 pb-7 pt-4 transition ${
+      className={`relative w-full overflow-hidden rounded-2xl border-2 ${meta.color} px-4 pb-7 pt-4 transition ${
         selected ? `ring-2 ${meta.ring}` : "opacity-90"
       }`}
     >
@@ -142,7 +192,9 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
           </button>
         </div>
       </div>
-      <div className="mb-1 text-base font-semibold leading-snug">{candidate.title || "(제목 없음)"}</div>
+      <div className="mb-1 break-words text-base font-semibold leading-snug">
+        {candidate.title || "(제목 없음)"}
+      </div>
       {(candidate.start_time || candidate.end_time) && (
         <div className="mb-1 text-xs text-neutral-500">
           {formatTime(candidate.start_time)}
@@ -150,7 +202,9 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
         </div>
       )}
       {candidate.description && (
-        <p className="whitespace-pre-wrap text-sm text-neutral-600">{candidate.description}</p>
+        <p className="whitespace-pre-wrap break-words text-sm text-neutral-600 [overflow-wrap:anywhere]">
+          {candidate.description}
+        </p>
       )}
       {candidate.created_by && (
         <div className="mt-2 text-[10px] uppercase tracking-wider text-neutral-400">by {candidate.created_by}</div>

@@ -116,7 +116,7 @@ export default function BlockCarousel({ block, candidates, tripCode, onChanged }
         <div className="embla -mx-1" ref={emblaRef}>
           <div className="embla__container gap-3 px-1">
             {candidates.map((c) => (
-              <div key={c.id} className="embla__slide" style={{ flex: "0 0 88%" }}>
+              <div key={c.id} className="embla__slide flex" style={{ flex: "0 0 88%" }}>
                 <CandidateCard
                   candidate={c}
                   selected={c.id === block.selected_candidate_id}
@@ -125,8 +125,8 @@ export default function BlockCarousel({ block, candidates, tripCode, onChanged }
                 />
               </div>
             ))}
-            <div className="embla__slide" style={{ flex: "0 0 88%" }}>
-              <div className="flex h-full min-h-[120px] items-center justify-center rounded-2xl border-2 border-dashed border-neutral-200 bg-white/40 p-4">
+            <div className="embla__slide flex" style={{ flex: "0 0 88%" }}>
+              <div className="flex w-full items-center justify-center rounded-2xl border-2 border-dashed border-neutral-200 bg-white/40 p-4">
                 <AddCandidateButtons onAdd={addCandidate} compact />
               </div>
             </div>

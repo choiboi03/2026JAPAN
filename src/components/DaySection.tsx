@@ -54,10 +54,12 @@ export default function DaySection({ day, index, tripCode, blocks, candidatesByB
 
   return (
     <section className="space-y-3">
-      <div className="sticky top-[88px] z-20 -mx-4 bg-gradient-to-b from-[#fff5f7] via-[#fff5f7]/95 to-[#fff5f7]/80 px-4 py-2 backdrop-blur">
+      <div className="sticky top-[88px] z-20 -mx-4 bg-white/95 px-4 py-2.5 shadow-sm ring-1 ring-black/5 backdrop-blur">
         <div className="flex items-baseline gap-2">
-          <span className="text-xs font-semibold text-sakura-500">DAY {index + 1}</span>
-          <h2 className="text-lg font-bold tracking-tight">{formatDateKo(day.date)}</h2>
+          <span className="rounded-full bg-sakura-100 px-2 py-0.5 text-[10px] font-bold tracking-wider text-sakura-700">
+            DAY {index + 1}
+          </span>
+          <h2 className="text-base font-bold tracking-tight">{formatDateKo(day.date)}</h2>
         </div>
       </div>
 
