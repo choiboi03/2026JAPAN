@@ -53,7 +53,7 @@ export default function TripPage({ params }: { params: { code: string } }) {
     <>
       <TripHeader trip={trip} />
       <NamePrompt tripId={trip.id} tripCode={trip.code}>
-        <main className="mx-auto max-w-md px-4 pb-24 pt-1">
+        <main className="mx-auto max-w-md px-4 pb-24">
           {activeDay ? (
             <DaySection
               key={activeDay.id}
