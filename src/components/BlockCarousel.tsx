@@ -5,7 +5,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { Block, Candidate, CandidateType } from "@/lib/types";
+import { CANDIDATE_TYPE_META, type Block, type Candidate, type CandidateType } from "@/lib/types";
 import CandidateCard from "./CandidateCard";
 import { getSupabase } from "@/lib/supabase";
 import { useMe } from "@/lib/me";
@@ -96,7 +96,7 @@ export default function BlockCarousel({ block, candidates, tripCode, onChanged }
     return (
       <div ref={sortable.setNodeRef} style={sortStyle} className="flex items-stretch gap-1">
         {dragHandle}
-        <div className="flex-1 rounded-2xl border-2 border-dashed border-neutral-200 bg-white/40 p-4">
+        <div className="flex-1 rounded-3xl border border-dashed border-neutral-300 bg-white/50 p-4 backdrop-blur-sm">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-xs font-semibold text-neutral-400">새 블록</span>
             <button onClick={deleteBlock} className="rounded-full p-1 text-neutral-300 hover:text-red-500">
@@ -126,7 +126,7 @@ export default function BlockCarousel({ block, candidates, tripCode, onChanged }
               </div>
             ))}
             <div className="embla__slide flex" style={{ flex: "0 0 88%" }}>
-              <div className="flex w-full items-center justify-center rounded-2xl border-2 border-dashed border-neutral-200 bg-white/40 p-4">
+              <div className="flex w-full items-center justify-center rounded-3xl border border-dashed border-neutral-300 bg-white/50 p-4 backdrop-blur-sm">
                 <AddCandidateButtons onAdd={addCandidate} compact />
               </div>
             </div>
@@ -158,22 +158,21 @@ function AddCandidateButtons({
   onAdd: (type: CandidateType) => void;
   compact?: boolean;
 }) {
-  const buttons: { type: CandidateType; label: string; emoji: string; cls: string }[] = [
-    { type: "move", label: "이동", emoji: "🚆", cls: "bg-sky-100 text-sky-700" },
-    { type: "place", label: "장소", emoji: "📍", cls: "bg-emerald-100 text-emerald-700" },
-    { type: "other", label: "기타", emoji: "✨", cls: "bg-amber-100 text-amber-700" }
-  ];
+  const types: CandidateType[] = ["move", "place", "other"];
   return (
     <div className={compact ? "flex flex-col gap-2" : "grid grid-cols-3 gap-2"}>
-      {buttons.map((b) => (
-        <button
-          key={b.type}
-          onClick={() => onAdd(b.type)}
-          className={`flex items-center justify-center gap-1.5 rounded-lg ${b.cls} px-3 py-2 text-xs font-semibold`}
-        >
-          <Plus className="h-3.5 w-3.5" /> {b.emoji} {b.label}
-        </button>
-      ))}
+      {types.map((t) => {
+        const m = CANDIDATE_TYPE_META[t];
+        return (
+          <button
+            key={t}
+            onClick={() => onAdd(t)}
+            className={`flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition active:scale-95 ${m.addButton}`}
+          >
+            <Plus className="h-3.5 w-3.5" /> {m.emoji} {m.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

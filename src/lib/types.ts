@@ -63,27 +63,46 @@ export interface Participant {
 
 export const CANDIDATE_TYPE_META: Record<
   CandidateType,
-  { label: string; emoji: string; color: string; ring: string; chip: string }
+  {
+    label: string;
+    emoji: string;
+    /** outer card surface: gradient + subtle ring + colored glow */
+    card: string;
+    /** when the candidate is the chosen one for its block */
+    cardSelected: string;
+    /** the type chip shown in the card header */
+    chip: string;
+    /** soft blurred blob in the card corner */
+    blob: string;
+    /** small pastel button used for "add candidate" */
+    addButton: string;
+  }
 > = {
   move: {
     label: "이동",
     emoji: "🚆",
-    color: "bg-sky-50 border-sky-200",
-    ring: "ring-sky-300",
-    chip: "bg-sky-100 text-sky-700"
+    card: "bg-gradient-to-br from-sky-100/85 via-white/80 to-white/70 ring-1 ring-sky-200/70 shadow-[0_14px_36px_-14px_rgba(14,165,233,0.45)]",
+    cardSelected: "ring-2 ring-sky-400 shadow-[0_18px_40px_-12px_rgba(14,165,233,0.55)]",
+    chip: "bg-white/70 text-sky-700 ring-1 ring-sky-200/80 backdrop-blur-sm",
+    blob: "bg-sky-300",
+    addButton: "bg-gradient-to-br from-sky-50 to-sky-100 text-sky-700 ring-1 ring-sky-200/80"
   },
   place: {
     label: "장소",
     emoji: "📍",
-    color: "bg-emerald-50 border-emerald-200",
-    ring: "ring-emerald-300",
-    chip: "bg-emerald-100 text-emerald-700"
+    card: "bg-gradient-to-br from-emerald-100/85 via-white/80 to-white/70 ring-1 ring-emerald-200/70 shadow-[0_14px_36px_-14px_rgba(16,185,129,0.45)]",
+    cardSelected: "ring-2 ring-emerald-400 shadow-[0_18px_40px_-12px_rgba(16,185,129,0.55)]",
+    chip: "bg-white/70 text-emerald-700 ring-1 ring-emerald-200/80 backdrop-blur-sm",
+    blob: "bg-emerald-300",
+    addButton: "bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-700 ring-1 ring-emerald-200/80"
   },
   other: {
     label: "기타",
     emoji: "✨",
-    color: "bg-amber-50 border-amber-200",
-    ring: "ring-amber-300",
-    chip: "bg-amber-100 text-amber-700"
+    card: "bg-gradient-to-br from-amber-100/85 via-white/80 to-white/70 ring-1 ring-amber-200/70 shadow-[0_14px_36px_-14px_rgba(245,158,11,0.45)]",
+    cardSelected: "ring-2 ring-amber-400 shadow-[0_18px_40px_-12px_rgba(245,158,11,0.55)]",
+    chip: "bg-white/70 text-amber-700 ring-1 ring-amber-200/80 backdrop-blur-sm",
+    blob: "bg-amber-300",
+    addButton: "bg-gradient-to-br from-amber-50 to-amber-100 text-amber-700 ring-1 ring-amber-200/80"
   }
 };

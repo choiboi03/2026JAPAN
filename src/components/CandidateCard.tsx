@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Trash2, Pencil } from "lucide-react";
+import { Check, Trash2, Pencil, Clock } from "lucide-react";
 import { CANDIDATE_TYPE_META, type Candidate, type CandidateType } from "@/lib/types";
 import { formatTime } from "@/lib/date";
 import { getSupabase } from "@/lib/supabase";
@@ -73,142 +73,189 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
     onChanged();
   }
 
+  // ────────────────────────────────────────────────────────────────────
+  // EDIT MODE
+  // ────────────────────────────────────────────────────────────────────
   if (editing) {
     return (
-      <div className={`relative w-full overflow-hidden rounded-2xl border-2 ${meta.color} px-4 pb-7 pt-4`}>
-        <div className="mb-2 flex gap-1">
-          {(["move", "place", "other"] as CandidateType[]).map((t) => {
-            const m = CANDIDATE_TYPE_META[t];
-            return (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setType(t)}
-                className={`rounded-full px-2.5 py-1 text-xs ${
-                  type === t ? `${m.chip} font-bold` : "bg-white/60 text-neutral-500"
-                }`}
-              >
-                {m.emoji} {m.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {type === "move" ? (
-          <div className="mb-2 space-y-2">
-            <label className="flex items-center gap-2">
-              <span className="w-10 text-xs font-semibold text-neutral-500">출발</span>
-              <input
-                value={fromLoc}
-                onChange={(e) => setFromLoc(e.target.value)}
-                placeholder="예: 인천공항"
-                className="w-full min-w-0 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none"
-              />
-            </label>
-            <label className="flex items-center gap-2">
-              <span className="w-10 text-xs font-semibold text-neutral-500">도착</span>
-              <input
-                value={toLoc}
-                onChange={(e) => setToLoc(e.target.value)}
-                placeholder="예: 나리타공항"
-                className="w-full min-w-0 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none"
-              />
-            </label>
-          </div>
-        ) : (
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="제목"
-            className="mb-2 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none"
-          />
-        )}
-
-        <div className="mb-2 grid grid-cols-2 gap-2">
-          <input
-            type="time"
-            value={start ? start.slice(0, 5) : ""}
-            onChange={(e) => setStart(e.target.value)}
-            className="rounded-lg border border-neutral-200 bg-white px-2 py-2 text-sm outline-none"
-          />
-          <input
-            type="time"
-            value={end ? end.slice(0, 5) : ""}
-            onChange={(e) => setEnd(e.target.value)}
-            className="rounded-lg border border-neutral-200 bg-white px-2 py-2 text-sm outline-none"
-          />
-        </div>
-        <textarea
-          value={desc}
-          onChange={(e) => setDesc(e.target.value)}
-          rows={2}
-          placeholder="메모 (주소, 비용, 링크 등)"
-          className="mb-3 w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none"
+      <div className={`relative w-full overflow-hidden rounded-3xl px-5 pb-5 pt-4 ${meta.card}`}>
+        <div
+          className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-50 blur-3xl ${meta.blob}`}
         />
-        <div className="flex gap-2">
-          <button
-            onClick={save}
-            disabled={busy}
-            className="flex-1 rounded-lg bg-neutral-900 py-2 text-sm font-semibold text-white disabled:opacity-50"
-          >
-            저장
-          </button>
-          <button
-            onClick={() => setEditing(false)}
-            className="rounded-lg bg-white px-4 py-2 text-sm text-neutral-600 ring-1 ring-neutral-200"
-          >
-            취소
-          </button>
-          <button onClick={remove} className="rounded-lg bg-red-50 px-3 py-2 text-red-600 ring-1 ring-red-200">
-            <Trash2 className="h-4 w-4" />
-          </button>
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-70" />
+
+        <div className="relative">
+          <div className="mb-3 flex gap-1.5">
+            {(["move", "place", "other"] as CandidateType[]).map((t) => {
+              const m = CANDIDATE_TYPE_META[t];
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setType(t)}
+                  className={`rounded-full px-3 py-1.5 text-xs transition ${
+                    type === t ? `${m.chip} font-bold shadow-sm` : "bg-white/40 text-neutral-500 ring-1 ring-black/5"
+                  }`}
+                >
+                  {m.emoji} {m.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {type === "move" ? (
+            <div className="mb-3 space-y-2">
+              <label className="flex items-center gap-2">
+                <span className="w-10 shrink-0 text-xs font-semibold text-neutral-500">출발</span>
+                <input
+                  value={fromLoc}
+                  onChange={(e) => setFromLoc(e.target.value)}
+                  placeholder="예: 인천공항"
+                  className="w-full min-w-0 rounded-xl border-0 bg-white/80 px-3 py-2.5 text-sm text-neutral-900 ring-1 ring-black/5 outline-none placeholder:text-neutral-400 focus:bg-white focus:ring-2 focus:ring-neutral-900/20"
+                />
+              </label>
+              <label className="flex items-center gap-2">
+                <span className="w-10 shrink-0 text-xs font-semibold text-neutral-500">도착</span>
+                <input
+                  value={toLoc}
+                  onChange={(e) => setToLoc(e.target.value)}
+                  placeholder="예: 나리타공항"
+                  className="w-full min-w-0 rounded-xl border-0 bg-white/80 px-3 py-2.5 text-sm text-neutral-900 ring-1 ring-black/5 outline-none placeholder:text-neutral-400 focus:bg-white focus:ring-2 focus:ring-neutral-900/20"
+                />
+              </label>
+            </div>
+          ) : (
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="제목"
+              className="mb-3 w-full rounded-xl border-0 bg-white/80 px-3 py-2.5 text-sm text-neutral-900 ring-1 ring-black/5 outline-none placeholder:text-neutral-400 focus:bg-white focus:ring-2 focus:ring-neutral-900/20"
+            />
+          )}
+
+          <div className="mb-3 grid grid-cols-2 gap-2">
+            <input
+              type="time"
+              value={start ? start.slice(0, 5) : ""}
+              onChange={(e) => setStart(e.target.value)}
+              className="rounded-xl border-0 bg-white/80 px-3 py-2.5 font-mono text-sm text-neutral-700 ring-1 ring-black/5 outline-none focus:bg-white focus:ring-2 focus:ring-neutral-900/20"
+            />
+            <input
+              type="time"
+              value={end ? end.slice(0, 5) : ""}
+              onChange={(e) => setEnd(e.target.value)}
+              className="rounded-xl border-0 bg-white/80 px-3 py-2.5 font-mono text-sm text-neutral-700 ring-1 ring-black/5 outline-none focus:bg-white focus:ring-2 focus:ring-neutral-900/20"
+            />
+          </div>
+          <textarea
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
+            rows={3}
+            placeholder="메모 (주소, 비용, 링크 등)"
+            className="mb-3 w-full resize-none rounded-xl border-0 bg-white/80 px-3 py-2.5 text-sm text-neutral-700 ring-1 ring-black/5 outline-none placeholder:text-neutral-400 focus:bg-white focus:ring-2 focus:ring-neutral-900/20"
+          />
+
+          <div className="flex gap-2">
+            <button
+              onClick={save}
+              disabled={busy}
+              className="flex-1 rounded-xl bg-neutral-900 py-2.5 text-sm font-semibold text-white shadow-md shadow-neutral-900/20 disabled:opacity-50"
+            >
+              저장
+            </button>
+            <button
+              onClick={() => setEditing(false)}
+              className="rounded-xl bg-white/80 px-4 py-2.5 text-sm text-neutral-700 ring-1 ring-black/5 hover:bg-white"
+            >
+              취소
+            </button>
+            <button
+              onClick={remove}
+              className="rounded-xl bg-white/80 px-3 py-2.5 text-red-600 ring-1 ring-red-200 hover:bg-white"
+              aria-label="후보 삭제"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
+  // ────────────────────────────────────────────────────────────────────
+  // DISPLAY MODE
+  // ────────────────────────────────────────────────────────────────────
   return (
     <div
-      className={`relative w-full overflow-hidden rounded-2xl border-2 ${meta.color} px-4 pb-7 pt-4 transition ${
-        selected ? `ring-2 ${meta.ring}` : "opacity-90"
+      className={`relative w-full overflow-hidden rounded-3xl px-5 pb-7 pt-4 transition ${meta.card} ${
+        selected ? meta.cardSelected : "opacity-95"
       }`}
     >
-      <div className="mb-1 flex items-center justify-between">
-        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${meta.chip}`}>
-          {meta.emoji} {meta.label}
-        </span>
-        <div className="flex gap-1">
-          <button onClick={() => setEditing(true)} className="rounded-full p-1.5 text-neutral-400 hover:bg-white/70">
-            <Pencil className="h-3.5 w-3.5" />
-          </button>
-          <button
-            onClick={onSelect}
-            className={`rounded-full p-1.5 transition ${
-              selected ? "bg-neutral-900 text-white" : "bg-white/60 text-neutral-400 hover:text-neutral-900"
-            }`}
-            title="이 후보를 확정"
-          >
-            <Check className="h-3.5 w-3.5" />
-          </button>
+      {/* color blob in corner */}
+      <div
+        className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-50 blur-3xl ${meta.blob}`}
+      />
+      {/* glossy top highlight */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-70" />
+
+      <div className="relative">
+        {/* Header: type chip + actions */}
+        <div className="mb-2.5 flex items-center justify-between">
+          <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${meta.chip}`}>
+            <span className="text-sm leading-none">{meta.emoji}</span>
+            {meta.label}
+          </span>
+          <div className="flex gap-1">
+            <button
+              onClick={() => setEditing(true)}
+              aria-label="편집"
+              className="rounded-full p-1.5 text-neutral-400 transition hover:bg-white/60 hover:text-neutral-700"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={onSelect}
+              aria-label="이 후보로 확정"
+              className={`rounded-full p-1.5 transition ${
+                selected
+                  ? "bg-neutral-900 text-white shadow-md shadow-neutral-900/30"
+                  : "bg-white/70 text-neutral-400 ring-1 ring-black/5 hover:text-neutral-900"
+              }`}
+            >
+              <Check className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="mb-1 break-words text-base font-semibold leading-snug">
-        {candidate.title || "(제목 없음)"}
-      </div>
-      {(candidate.start_time || candidate.end_time) && (
-        <div className="mb-1 text-xs text-neutral-500">
-          {formatTime(candidate.start_time)}
-          {candidate.end_time ? ` ~ ${formatTime(candidate.end_time)}` : ""}
+
+        {/* Title */}
+        <div className="mb-2 break-words text-[17px] font-bold leading-snug text-neutral-900">
+          {candidate.title || <span className="text-neutral-400">(제목 없음)</span>}
         </div>
-      )}
-      {candidate.description && (
-        <p className="whitespace-pre-wrap break-words text-sm text-neutral-600 [overflow-wrap:anywhere]">
-          {candidate.description}
-        </p>
-      )}
-      {candidate.created_by && (
-        <div className="mt-2 text-[10px] uppercase tracking-wider text-neutral-400">by {candidate.created_by}</div>
-      )}
+
+        {/* Time pill */}
+        {(candidate.start_time || candidate.end_time) && (
+          <div className="mb-2 inline-flex items-center gap-1.5 rounded-md bg-white/70 px-2 py-1 text-[11px] font-mono text-neutral-700 ring-1 ring-black/5">
+            <Clock className="h-3 w-3" />
+            {formatTime(candidate.start_time)}
+            {candidate.end_time ? ` ~ ${formatTime(candidate.end_time)}` : ""}
+          </div>
+        )}
+
+        {/* Description */}
+        {candidate.description && (
+          <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-neutral-700 [overflow-wrap:anywhere]">
+            {candidate.description}
+          </p>
+        )}
+
+        {/* Footer: by user */}
+        {candidate.created_by && (
+          <div className="mt-3 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-neutral-400">
+            <span className="h-1 w-1 rounded-full bg-neutral-300" />
+            by {candidate.created_by}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
