@@ -96,7 +96,7 @@ export default function BlockCarousel({ block, candidates, tripCode, onChanged }
     return (
       <div ref={sortable.setNodeRef} style={sortStyle} className="flex items-stretch gap-1">
         {dragHandle}
-        <div className="flex-1 rounded-3xl border border-dashed border-neutral-300 bg-white/50 p-4 backdrop-blur-sm">
+        <div className="flex-1 rounded-2xl border border-dashed border-neutral-300 bg-white/70 p-4">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-xs font-semibold text-neutral-400">새 블록</span>
             <button onClick={deleteBlock} className="rounded-full p-1 text-neutral-300 hover:text-red-500">
@@ -116,7 +116,7 @@ export default function BlockCarousel({ block, candidates, tripCode, onChanged }
         <div className="embla -mx-1" ref={emblaRef}>
           <div className="embla__container gap-3 px-1">
             {candidates.map((c) => (
-              <div key={c.id} className="embla__slide flex" style={{ flex: "0 0 88%" }}>
+              <div key={c.id} className="embla__slide flex" style={{ flex: "0 0 92%" }}>
                 <CandidateCard
                   candidate={c}
                   selected={c.id === block.selected_candidate_id}
@@ -125,8 +125,8 @@ export default function BlockCarousel({ block, candidates, tripCode, onChanged }
                 />
               </div>
             ))}
-            <div className="embla__slide flex" style={{ flex: "0 0 88%" }}>
-              <div className="flex w-full items-center justify-center rounded-3xl border border-dashed border-neutral-300 bg-white/50 p-4 backdrop-blur-sm">
+            <div className="embla__slide flex" style={{ flex: "0 0 92%" }}>
+              <div className="flex w-full items-center justify-center rounded-2xl border border-dashed border-neutral-300 bg-white/70 p-4">
                 <AddCandidateButtons onAdd={addCandidate} compact />
               </div>
             </div>
