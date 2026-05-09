@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ArrowLeft, Calendar, Camera, Film, Copy, Check, Settings } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Trip } from "@/lib/types";
 import TripSettingsModal from "./TripSettingsModal";
 
@@ -16,6 +16,25 @@ export default function TripHeader({ trip }: Props) {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+
+  // Publish the actual rendered header height as a CSS variable so the
+  // day-section sticky header can pin exactly under us with no overlap or gap.
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const update = () => {
+      document.documentElement.style.setProperty("--trip-header-h", `${el.offsetHeight}px`);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
 
   function copyCode() {
     navigator.clipboard.writeText(trip.code).then(() => {
@@ -32,23 +51,23 @@ export default function TripHeader({ trip }: Props) {
 
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-black/5 bg-white">
-        <div className="mx-auto flex max-w-md items-center gap-2 px-4 py-3">
+      <header ref={headerRef} className="sticky top-0 z-30 border-b border-black/5 bg-white">
+        <div className="mx-auto flex max-w-md items-center gap-2 px-4 py-2.5">
           <Link href="/" className="rounded-full p-1.5 text-neutral-500 hover:bg-neutral-100">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-semibold">{trip.title}</div>
-            <div className="text-[11px] text-neutral-400">
+            <div className="truncate text-sm font-semibold leading-tight">{trip.title}</div>
+            <div className="text-[11px] leading-tight text-neutral-400">
               {trip.start_date} ~ {trip.end_date}
             </div>
           </div>
           <button
             onClick={() => setSettingsOpen(true)}
             aria-label="여행 설정"
-            className="rounded-full p-2 text-neutral-500 hover:bg-neutral-100"
+            className="rounded-full p-1.5 text-neutral-500 hover:bg-neutral-100"
           >
-            <Settings className="h-4 w-4" />
+            <Settings className="h-[18px] w-[18px]" />
           </button>
           <button
             onClick={copyCode}
@@ -84,12 +103,7 @@ export default function TripHeader({ trip }: Props) {
         <TripSettingsModal
           trip={trip}
           onClose={() => setSettingsOpen(false)}
-          onSaved={() => {
-            // Realtime subscription on the trip page reloads automatically,
-            // but for the photos/summary pages we also need a fresh fetch —
-            // a router.refresh() is the simplest way to re-trigger queries.
-            router.refresh();
-          }}
+          onSaved={() => router.refresh()}
         />
       )}
     </>
