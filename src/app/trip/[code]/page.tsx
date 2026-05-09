@@ -27,7 +27,7 @@ export default function TripPage({ params }: { params: { code: string } }) {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-sakura-500" />
+        <Loader2 className="h-6 w-6 animate-spin text-ocean-500" />
       </div>
     );
   }
@@ -43,7 +43,7 @@ export default function TripPage({ params }: { params: { code: string } }) {
     <>
       <TripHeader trip={trip} />
       <NamePrompt tripId={trip.id} tripCode={trip.code}>
-        <main className="mx-auto max-w-md px-4 pb-24 pt-4">
+        <main className="mx-auto max-w-md px-4 pb-24 pt-1">
           <div className="space-y-8">
             {days.map((day, i) => (
               <DaySection

@@ -54,9 +54,9 @@ export default function DaySection({ day, index, tripCode, blocks, candidatesByB
 
   return (
     <section className="space-y-3">
-      <div className="sticky top-[88px] z-20 -mx-4 bg-white/95 px-4 py-2.5 shadow-sm ring-1 ring-black/5 backdrop-blur">
+      <div className="sticky top-[81px] z-20 -mx-4 bg-white/95 px-4 py-2.5 shadow-sm ring-1 ring-black/5 backdrop-blur">
         <div className="flex items-baseline gap-2">
-          <span className="rounded-full bg-sakura-100 px-2 py-0.5 text-[10px] font-bold tracking-wider text-sakura-700">
+          <span className="rounded-full bg-ocean-100 px-2 py-0.5 text-[10px] font-bold tracking-wider text-ocean-700">
             DAY {index + 1}
           </span>
           <h2 className="text-base font-bold tracking-tight">{formatDateKo(day.date)}</h2>
@@ -87,7 +87,7 @@ export default function DaySection({ day, index, tripCode, blocks, candidatesByB
 
       <button
         onClick={addBlock}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-neutral-300 py-3 text-sm font-medium text-neutral-500 transition hover:border-sakura-300 hover:bg-white hover:text-sakura-600"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-neutral-300 py-3 text-sm font-medium text-neutral-500 transition hover:border-ocean-300 hover:bg-white hover:text-ocean-600"
       >
         <Plus className="h-4 w-4" /> 블록 추가
       </button>

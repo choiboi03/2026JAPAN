@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const PALETTE = ["#f43f6a", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"];
+const PALETTE = ["#0ea5e9", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899", "#ef4444"];
 
 export interface Me {
   name: string;

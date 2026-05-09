@@ -13,7 +13,7 @@ html, body {
 
 body {
   min-height: 100vh;
-  background: linear-gradient(180deg, #fff5f7 0%, #fafafa 100%) fixed;
+  background: linear-gradient(180deg, #f0f9ff 0%, #fafafa 100%) fixed;
   color: #1a1a1a;
   font-feature-settings: "ss01", "cv11";
 }

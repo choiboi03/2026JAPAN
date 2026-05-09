@@ -90,7 +90,7 @@ export default function Home() {
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col px-5 pb-16 pt-12">
       <header className="mb-10 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-sakura-500 text-white shadow-lg shadow-sakura-200">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-ocean-500 text-white shadow-lg shadow-ocean-200">
           <Plane className="h-7 w-7" />
         </div>
         <h1 className="text-3xl font-bold tracking-tight">wetrip</h1>
@@ -111,7 +111,7 @@ export default function Home() {
           type="button"
           onClick={() => setMode("join")}
           className={`rounded-xl py-2.5 text-sm font-medium transition ${
-            mode === "join" ? "bg-sakura-500 text-white shadow" : "text-neutral-600"
+            mode === "join" ? "bg-ocean-500 text-white shadow" : "text-neutral-600"
           }`}
         >
           코드로 참여
@@ -120,7 +120,7 @@ export default function Home() {
           type="button"
           onClick={() => setMode("create")}
           className={`rounded-xl py-2.5 text-sm font-medium transition ${
-            mode === "create" ? "bg-sakura-500 text-white shadow" : "text-neutral-600"
+            mode === "create" ? "bg-ocean-500 text-white shadow" : "text-neutral-600"
           }`}
         >
           새 여행 만들기
@@ -137,14 +137,14 @@ export default function Home() {
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               placeholder="예: K8M2X7"
               maxLength={12}
-              className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-center text-2xl font-mono tracking-[0.4em] outline-none focus:border-sakura-400 focus:bg-white"
+              className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-center text-2xl font-mono tracking-[0.4em] outline-none focus:border-ocean-400 focus:bg-white"
             />
           </label>
           {err && <p className="text-sm text-red-600">{err}</p>}
           <button
             type="submit"
             disabled={busy}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-sakura-500 py-3 font-semibold text-white shadow-md shadow-sakura-200 transition active:scale-[0.99] disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-ocean-500 py-3 font-semibold text-white shadow-md shadow-ocean-200 transition active:scale-[0.99] disabled:opacity-50"
           >
             {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <Users className="h-5 w-5" />}
             합류하기
@@ -158,7 +158,7 @@ export default function Home() {
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 outline-none focus:border-sakura-400 focus:bg-white"
+              className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 outline-none focus:border-ocean-400 focus:bg-white"
             />
           </label>
           <div className="grid grid-cols-2 gap-3">
@@ -168,7 +168,7 @@ export default function Home() {
                 type="date"
                 value={start}
                 onChange={(e) => setStart(e.target.value)}
-                className="mt-1 block h-12 w-full appearance-none rounded-xl border border-neutral-200 bg-neutral-50 px-3 text-left text-base outline-none focus:border-sakura-400 focus:bg-white"
+                className="mt-1 block h-12 w-full appearance-none rounded-xl border border-neutral-200 bg-neutral-50 px-3 text-left text-base outline-none focus:border-ocean-400 focus:bg-white"
               />
             </label>
             <label className="block">
@@ -177,7 +177,7 @@ export default function Home() {
                 type="date"
                 value={end}
                 onChange={(e) => setEnd(e.target.value)}
-                className="mt-1 block h-12 w-full appearance-none rounded-xl border border-neutral-200 bg-neutral-50 px-3 text-left text-base outline-none focus:border-sakura-400 focus:bg-white"
+                className="mt-1 block h-12 w-full appearance-none rounded-xl border border-neutral-200 bg-neutral-50 px-3 text-left text-base outline-none focus:border-ocean-400 focus:bg-white"
               />
             </label>
           </div>
@@ -185,7 +185,7 @@ export default function Home() {
           <button
             type="submit"
             disabled={busy}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-sakura-500 py-3 font-semibold text-white shadow-md shadow-sakura-200 transition active:scale-[0.99] disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-ocean-500 py-3 font-semibold text-white shadow-md shadow-ocean-200 transition active:scale-[0.99] disabled:opacity-50"
           >
             {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
             만들기

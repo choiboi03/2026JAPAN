@@ -57,7 +57,7 @@ export default function TripHeader({ trip }: Props) {
               href={t.href}
               className={`flex flex-1 items-center justify-center gap-1.5 border-b-2 px-3 py-2 text-sm transition ${
                 active
-                  ? "border-sakura-500 font-semibold text-sakura-600"
+                  ? "border-ocean-500 font-semibold text-ocean-600"
                   : "border-transparent text-neutral-400 hover:text-neutral-700"
               }`}
             >
