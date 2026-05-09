@@ -69,7 +69,10 @@ export default function DaySection({
 
   return (
     <section className="space-y-3">
-      <div className="sticky top-[81px] z-20 -mx-4 bg-white px-2 py-2 shadow-sm ring-1 ring-black/5">
+      <div
+        className="sticky z-20 -mx-4 bg-white px-2 py-2 shadow-sm ring-1 ring-black/5"
+        style={{ top: "var(--trip-header-h, 86px)" }}
+      >
         <div className="flex items-center justify-between gap-2">
           <button
             onClick={onPrevDay}
