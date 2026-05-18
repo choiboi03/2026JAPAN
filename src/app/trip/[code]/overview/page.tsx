@@ -3,29 +3,31 @@
 export const runtime = "edge";
 
 import { useMemo } from "react";
-import { Loader2, Clock, ExternalLink } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import TripHeader from "@/components/TripHeader";
 import NamePrompt from "@/components/NamePrompt";
 import { useTripData } from "@/lib/useTripData";
-import { CANDIDATE_TYPE_META } from "@/lib/types";
-import { formatDateKo, formatTime } from "@/lib/date";
+import { CANDIDATE_TYPE_META, type Candidate } from "@/lib/types";
+import { formatTime } from "@/lib/date";
 
-function getLink(meta: Record<string, unknown>): { label: string; url: string } | null {
-  const raw = meta.link;
-  if (raw && typeof raw === "object") {
-    const l = raw as Record<string, unknown>;
-    if (typeof l.url === "string" && l.url) {
-      return {
-        label: typeof l.label === "string" && l.label ? l.label : "링크",
-        url: l.url
-      };
-    }
-  }
-  return null;
+const HOUR_HEIGHT = 56;
+const COL_WIDTH = 150;
+const TIME_COL = 42;
+const HEADER_ROW = 52;
+const UNTIMED_ROW = 60;
+
+function parseHHMM(t: string | null): number | null {
+  if (!t) return null;
+  const m = t.match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  return parseInt(m[1], 10) + parseInt(m[2], 10) / 60;
 }
 
-function normalizeHref(url: string): string {
-  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+function dayLabel(date: string): string {
+  const d = new Date(date + "T00:00:00");
+  if (isNaN(d.getTime())) return date;
+  const wd = ["일", "월", "화", "수", "목", "금", "토"];
+  return `${d.getMonth() + 1}/${d.getDate()} (${wd[d.getDay()]})`;
 }
 
 export default function OverviewPage({ params }: { params: { code: string } }) {
@@ -33,6 +35,49 @@ export default function OverviewPage({ params }: { params: { code: string } }) {
   const { trip, days, blocks, candidates, loading, error } = useTripData(code);
 
   const candidateById = useMemo(() => new Map(candidates.map((c) => [c.id, c])), [candidates]);
+
+  const { startHour, endHour } = useMemo(() => {
+    let minH = 7;
+    let maxH = 22;
+    for (const b of blocks) {
+      const sel = b.selected_candidate_id ? candidateById.get(b.selected_candidate_id) : null;
+      if (!sel) continue;
+      const s = parseHHMM(sel.start_time);
+      const e = parseHHMM(sel.end_time);
+      if (s !== null) minH = Math.min(minH, Math.floor(s));
+      if (e !== null) maxH = Math.max(maxH, Math.ceil(e));
+      else if (s !== null) maxH = Math.max(maxH, Math.ceil(s + 1));
+    }
+    return { startHour: Math.max(0, minH), endHour: Math.min(24, maxH) };
+  }, [blocks, candidateById]);
+
+  const hours = useMemo(() => {
+    const out: number[] = [];
+    for (let h = startHour; h <= endHour; h++) out.push(h);
+    return out;
+  }, [startHour, endHour]);
+
+  // Untimed (no start_time) selected candidates per day
+  const untimedByDay = useMemo(() => {
+    const m = new Map<string, Candidate[]>();
+    for (const b of blocks) {
+      if (!b.selected_candidate_id) continue;
+      const c = candidateById.get(b.selected_candidate_id);
+      if (!c || c.start_time) continue;
+      const arr = m.get(b.day_id) ?? [];
+      arr.push(c);
+      m.set(b.day_id, arr);
+    }
+    return m;
+  }, [blocks, candidateById]);
+
+  const hasUntimed = useMemo(() => {
+    for (const arr of untimedByDay.values()) if (arr.length > 0) return true;
+    return false;
+  }, [untimedByDay]);
+
+  const canvasWidth = TIME_COL + COL_WIDTH * Math.max(days.length, 1);
+  const gridHeight = (endHour - startHour) * HOUR_HEIGHT;
 
   if (loading) {
     return (
@@ -53,99 +98,151 @@ export default function OverviewPage({ params }: { params: { code: string } }) {
     <>
       <TripHeader trip={trip} />
       <NamePrompt tripId={trip.id} tripCode={trip.code}>
-        <main className="mx-auto max-w-md px-4 pb-24 pt-4">
-          {days.length === 0 ? (
-            <p className="py-12 text-center text-sm text-neutral-400">아직 일정이 비어있어요.</p>
-          ) : (
-            <div className="space-y-6">
-              {days.map((day, i) => {
-                const dayBlocks = blocks
-                  .filter((b) => b.day_id === day.id)
-                  .sort((a, b) => a.position - b.position);
-                return (
-                  <section key={day.id} className="space-y-2">
-                    <div className="flex items-baseline gap-2 border-b border-neutral-200 pb-2">
-                      <span className="rounded-full bg-ocean-100 px-2 py-0.5 text-[10px] font-bold tracking-wider text-ocean-700">
-                        DAY {i + 1}
-                      </span>
-                      <h2 className="text-base font-bold tracking-tight">{formatDateKo(day.date)}</h2>
+        {days.length === 0 ? (
+          <main className="mx-auto max-w-md px-4 pb-24 pt-12">
+            <p className="text-center text-sm text-neutral-400">아직 일정이 비어있어요.</p>
+          </main>
+        ) : (
+          <div className="overflow-x-auto overflow-y-visible pb-12">
+            <div className="relative" style={{ width: canvasWidth }}>
+              {/* ── Day header row: sticks under the trip header */}
+              <div
+                className="sticky z-30 flex border-b border-neutral-200 bg-white"
+                style={{ top: "var(--trip-header-h, 86px)", height: HEADER_ROW }}
+              >
+                <div
+                  className="sticky left-0 z-40 shrink-0 border-r border-neutral-200 bg-white"
+                  style={{ width: TIME_COL }}
+                />
+                {days.map((d, i) => (
+                  <div
+                    key={d.id}
+                    className="flex shrink-0 flex-col items-center justify-center border-r border-neutral-100 px-2 text-center"
+                    style={{ width: COL_WIDTH }}
+                  >
+                    <div className="text-[10px] font-bold tracking-wider text-ocean-700">
+                      DAY {i + 1}
                     </div>
+                    <div className="text-xs font-semibold text-neutral-800">{dayLabel(d.date)}</div>
+                  </div>
+                ))}
+              </div>
 
-                    {dayBlocks.length === 0 ? (
-                      <p className="py-3 text-center text-xs text-neutral-400">일정 없음</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {dayBlocks.map((b) => {
-                          const sel = b.selected_candidate_id
-                            ? candidateById.get(b.selected_candidate_id)
-                            : null;
-                          if (!sel) {
-                            return (
-                              <div
-                                key={b.id}
-                                className="rounded-xl border border-dashed border-neutral-200 px-3 py-2 text-center text-[11px] text-neutral-400"
-                              >
-                                확정된 후보 없음
-                              </div>
-                            );
-                          }
-                          const m = CANDIDATE_TYPE_META[sel.type];
-                          const link = getLink(sel.meta);
-                          const hasTimeOrLink = sel.start_time || sel.end_time || link;
+              {/* ── Untimed row (only shown if any day has untimed selected candidates) */}
+              {hasUntimed && (
+                <div className="flex border-b border-neutral-200 bg-neutral-50" style={{ minHeight: UNTIMED_ROW }}>
+                  <div
+                    className="sticky left-0 z-20 flex shrink-0 items-start justify-end border-r border-neutral-200 bg-neutral-50 pr-1 pt-2 text-[9px] uppercase tracking-wider text-neutral-400"
+                    style={{ width: TIME_COL }}
+                  >
+                    종일
+                  </div>
+                  {days.map((d) => {
+                    const items = untimedByDay.get(d.id) ?? [];
+                    return (
+                      <div
+                        key={d.id}
+                        className="shrink-0 space-y-1 border-r border-neutral-100 p-1.5"
+                        style={{ width: COL_WIDTH }}
+                      >
+                        {items.map((c) => {
+                          const m = CANDIDATE_TYPE_META[c.type];
                           return (
                             <div
-                              key={b.id}
-                              className={`rounded-xl border-l-[3px] bg-white px-3 py-2.5 ring-1 ring-black/5 ${m.stripe}`}
+                              key={c.id}
+                              className={`overflow-hidden rounded-md border-l-[3px] bg-white px-1.5 py-1 ring-1 ring-black/5 ${m.stripe}`}
                             >
-                              <div className="mb-1 flex items-center gap-2">
-                                <span
-                                  className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${m.chip}`}
-                                >
-                                  <span className="text-xs leading-none">{m.emoji}</span>
-                                  {m.label}
-                                </span>
+                              <div className="break-words text-[10px] font-semibold leading-tight text-neutral-900">
+                                <span className="mr-1">{m.emoji}</span>
+                                {c.title || "(제목 없음)"}
                               </div>
-                              <div className="break-words text-sm font-semibold leading-snug text-neutral-900">
-                                {sel.title || <span className="text-neutral-400">(제목 없음)</span>}
-                              </div>
-                              {hasTimeOrLink && (
-                                <div className="mt-1 flex items-center gap-2">
-                                  {(sel.start_time || sel.end_time) && (
-                                    <span className="inline-flex items-center gap-1 text-[11px] font-mono text-neutral-500">
-                                      <Clock className="h-3 w-3" />
-                                      {formatTime(sel.start_time)}
-                                      {sel.end_time ? ` ~ ${formatTime(sel.end_time)}` : ""}
-                                    </span>
-                                  )}
-                                  {link && (
-                                    <a
-                                      href={normalizeHref(link.url)}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="ml-auto inline-flex max-w-[60%] items-center gap-1 truncate rounded-md bg-ocean-50 px-2 py-0.5 text-[11px] font-semibold text-ocean-700 ring-1 ring-ocean-200"
-                                    >
-                                      <ExternalLink className="h-3 w-3 shrink-0" />
-                                      <span className="truncate">{link.label}</span>
-                                    </a>
-                                  )}
-                                </div>
-                              )}
-                              {sel.description && (
-                                <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-neutral-500">
-                                  {sel.description}
-                                </p>
-                              )}
                             </div>
                           );
                         })}
                       </div>
-                    )}
-                  </section>
-                );
-              })}
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* ── Time grid */}
+              <div className="relative flex" style={{ height: gridHeight }}>
+                {/* Time labels (sticky left) */}
+                <div
+                  className="sticky left-0 z-20 shrink-0 border-r border-neutral-200 bg-white"
+                  style={{ width: TIME_COL }}
+                >
+                  {hours.map((h, i) => (
+                    <div
+                      key={h}
+                      className="relative border-b border-neutral-100"
+                      style={{ height: HOUR_HEIGHT }}
+                    >
+                      {i > 0 && (
+                        <span className="absolute -top-2 right-1 font-mono text-[10px] text-neutral-400">
+                          {String(h).padStart(2, "0")}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Day columns */}
+                {days.map((d) => {
+                  const dayBlocks = blocks
+                    .filter((b) => b.day_id === d.id)
+                    .map((b) => ({
+                      block: b,
+                      sel: b.selected_candidate_id ? candidateById.get(b.selected_candidate_id) : null
+                    }))
+                    .filter(
+                      (x): x is { block: typeof blocks[number]; sel: Candidate } =>
+                        Boolean(x.sel && x.sel.start_time)
+                    );
+                  return (
+                    <div
+                      key={d.id}
+                      className="relative shrink-0 border-r border-neutral-100"
+                      style={{ width: COL_WIDTH }}
+                    >
+                      {hours.map((h) => (
+                        <div
+                          key={h}
+                          className="border-b border-neutral-100"
+                          style={{ height: HOUR_HEIGHT }}
+                        />
+                      ))}
+                      {dayBlocks.map(({ block, sel }) => {
+                        const s = parseHHMM(sel.start_time)!;
+                        const e = parseHHMM(sel.end_time) ?? s + 1;
+                        const top = (s - startHour) * HOUR_HEIGHT;
+                        const height = Math.max(32, (e - s) * HOUR_HEIGHT - 2);
+                        const m = CANDIDATE_TYPE_META[sel.type];
+                        return (
+                          <div
+                            key={block.id}
+                            className={`absolute left-1 right-1 overflow-hidden rounded-md border-l-[3px] bg-white px-1.5 py-1 text-[10px] shadow-sm ring-1 ring-black/5 ${m.stripe}`}
+                            style={{ top, height }}
+                          >
+                            <div className="flex items-center gap-1 leading-tight">
+                              <span className="text-[10px]">{m.emoji}</span>
+                              <span className="font-mono text-[9px] text-neutral-500">
+                                {formatTime(sel.start_time)}
+                              </span>
+                            </div>
+                            <div className="line-clamp-3 break-words text-[11px] font-semibold leading-tight text-neutral-900">
+                              {sel.title || "(제목 없음)"}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          )}
-        </main>
+          </div>
+        )}
       </NamePrompt>
     </>
   );
