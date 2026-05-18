@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, Calendar, Camera, Film, Copy, Check, Settings } from "lucide-react";
+import { ArrowLeft, Calendar, ListChecks, Image as ImageIcon, Copy, Check, Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Trip } from "@/lib/types";
 import TripSettingsModal from "./TripSettingsModal";
@@ -43,10 +43,19 @@ export default function TripHeader({ trip }: Props) {
     });
   }
 
+  const planHref = `/trip/${trip.code}`;
+  const overviewHref = `/trip/${trip.code}/overview`;
+  const photosHref = `/trip/${trip.code}/photos`;
+  const summaryHref = `/trip/${trip.code}/summary`;
   const tabs = [
-    { href: `/trip/${trip.code}`, label: "계획", icon: Calendar },
-    { href: `/trip/${trip.code}/photos`, label: "사진", icon: Camera },
-    { href: `/trip/${trip.code}/summary`, label: "스토리", icon: Film }
+    { href: planHref, label: "계획", icon: Calendar, active: pathname === planHref },
+    { href: overviewHref, label: "전체", icon: ListChecks, active: pathname === overviewHref },
+    {
+      href: photosHref,
+      label: "추억",
+      icon: ImageIcon,
+      active: pathname === photosHref || pathname === summaryHref
+    }
   ];
 
   return (
@@ -79,14 +88,13 @@ export default function TripHeader({ trip }: Props) {
         </div>
         <nav className="mx-auto flex max-w-md gap-1 px-2">
           {tabs.map((t) => {
-            const active = pathname === t.href;
             const Icon = t.icon;
             return (
               <Link
                 key={t.href}
                 href={t.href}
                 className={`flex flex-1 items-center justify-center gap-1.5 border-b-2 px-3 py-2 text-sm transition ${
-                  active
+                  t.active
                     ? "border-ocean-500 font-semibold text-ocean-600"
                     : "border-transparent text-neutral-400 hover:text-neutral-700"
                 }`}

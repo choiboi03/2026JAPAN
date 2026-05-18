@@ -3,7 +3,8 @@
 export const runtime = "edge";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Camera, Loader2, Trash2, Upload, X } from "lucide-react";
+import Link from "next/link";
+import { Camera, Loader2, Trash2, Upload, X, Play } from "lucide-react";
 import TripHeader from "@/components/TripHeader";
 import NamePrompt from "@/components/NamePrompt";
 import { getSupabase, PHOTO_BUCKET } from "@/lib/supabase";
@@ -124,6 +125,17 @@ export default function PhotosPage({ params }: { params: { code: string } }) {
             className="hidden"
             onChange={(e) => handleFiles(e.target.files)}
           />
+          <Link
+            href={`/trip/${code}/summary`}
+            className="mb-3 flex items-center justify-between gap-2 rounded-xl bg-neutral-900 px-4 py-3 text-white shadow-md"
+          >
+            <span className="flex items-center gap-2 text-sm font-semibold">
+              <Play className="h-4 w-4 fill-white" />
+              스토리로 보기
+            </span>
+            <span className="text-xs text-white/60">{photos.length}컷 · {trip.start_date} ~ {trip.end_date}</span>
+          </Link>
+
           <div className="mb-4 grid grid-cols-2 gap-2">
             <button
               onClick={() => {
