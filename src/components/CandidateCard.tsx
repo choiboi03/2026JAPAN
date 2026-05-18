@@ -6,6 +6,43 @@ import { CANDIDATE_TYPE_META, type Candidate, type CandidateType } from "@/lib/t
 import { formatTime } from "@/lib/date";
 import { getSupabase } from "@/lib/supabase";
 
+// Inline helper: convert raw http(s) URLs in text into clickable <a> tags.
+// Trailing punctuation like '.', ',', ')' is peeled off so it doesn't end up
+// inside the link.
+const URL_RE = /(https?:\/\/[^\s<>"'`]+)/g;
+function linkify(text: string): React.ReactNode[] {
+  const out: React.ReactNode[] = [];
+  let lastIdx = 0;
+  URL_RE.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = URL_RE.exec(text)) !== null) {
+    if (m.index > lastIdx) out.push(text.slice(lastIdx, m.index));
+    let url = m[0];
+    let trailing = "";
+    const trailMatch = url.match(/([.,;:!?)\]}>]+)$/);
+    if (trailMatch) {
+      trailing = trailMatch[1];
+      url = url.slice(0, -trailing.length);
+    }
+    out.push(
+      <a
+        key={`${m.index}-${url}`}
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+        className="break-all text-ocean-600 underline decoration-ocean-300 underline-offset-2 hover:decoration-ocean-500"
+      >
+        {url}
+      </a>
+    );
+    if (trailing) out.push(trailing);
+    lastIdx = m.index + m[0].length;
+  }
+  if (lastIdx < text.length) out.push(text.slice(lastIdx));
+  return out;
+}
+
 interface Props {
   candidate: Candidate;
   selected: boolean;
@@ -232,7 +269,7 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
       {/* Description */}
       {candidate.description && (
         <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-neutral-600 [overflow-wrap:anywhere]">
-          {candidate.description}
+          {linkify(candidate.description)}
         </p>
       )}
 
