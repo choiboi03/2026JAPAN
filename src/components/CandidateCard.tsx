@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Trash2, Pencil, Clock } from "lucide-react";
+import { Check, Trash2, Pencil, Clock, ExternalLink } from "lucide-react";
 import { CANDIDATE_TYPE_META, type Candidate, type CandidateType } from "@/lib/types";
 import { formatTime } from "@/lib/date";
 import { getSupabase } from "@/lib/supabase";
@@ -55,6 +55,11 @@ interface MoveMeta {
   to?: string;
 }
 
+interface LinkMeta {
+  label?: string;
+  url?: string;
+}
+
 function getMove(meta: Record<string, unknown>): MoveMeta {
   return {
     from: typeof meta.from === "string" ? meta.from : "",
@@ -62,13 +67,32 @@ function getMove(meta: Record<string, unknown>): MoveMeta {
   };
 }
 
+function getLink(meta: Record<string, unknown>): LinkMeta {
+  const raw = meta.link;
+  if (raw && typeof raw === "object") {
+    const l = raw as Record<string, unknown>;
+    return {
+      label: typeof l.label === "string" ? l.label : "",
+      url: typeof l.url === "string" ? l.url : ""
+    };
+  }
+  return { label: "", url: "" };
+}
+
+function normalizeHref(url: string): string {
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
+
 export default function CandidateCard({ candidate, selected, onSelect, onChanged }: Props) {
   const meta = CANDIDATE_TYPE_META[candidate.type];
   const initialMove = getMove(candidate.meta);
+  const initialLink = getLink(candidate.meta);
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(candidate.title);
   const [fromLoc, setFromLoc] = useState(initialMove.from ?? "");
   const [toLoc, setToLoc] = useState(initialMove.to ?? "");
+  const [linkLabel, setLinkLabel] = useState(initialLink.label ?? "");
+  const [linkUrl, setLinkUrl] = useState(initialLink.url ?? "");
   const [desc, setDesc] = useState(candidate.description ?? "");
   const [type, setType] = useState<CandidateType>(candidate.type);
   const [start, setStart] = useState(candidate.start_time ?? "");
@@ -86,6 +110,13 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
     if (isMove) {
       nextMeta.from = fromLoc.trim();
       nextMeta.to = toLoc.trim();
+    }
+    const trimmedLabel = linkLabel.trim();
+    const trimmedUrl = linkUrl.trim();
+    if (trimmedUrl) {
+      nextMeta.link = { label: trimmedLabel || "링크", url: trimmedUrl };
+    } else {
+      delete nextMeta.link;
     }
     await sb
       .from("candidates")
@@ -167,7 +198,7 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
           />
         )}
 
-        <div className="mb-3 grid grid-cols-2 gap-2">
+        <div className="mb-2 grid grid-cols-2 gap-2">
           <input
             type="time"
             value={start ? start.slice(0, 5) : ""}
@@ -181,11 +212,30 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
             className="rounded-lg border border-neutral-200 bg-white px-3 py-2.5 font-mono text-sm text-neutral-700 outline-none focus:border-neutral-400"
           />
         </div>
+        <div className="mb-3 grid grid-cols-2 gap-2">
+          <input
+            value={linkLabel}
+            onChange={(e) => setLinkLabel(e.target.value)}
+            placeholder="링크 이름"
+            maxLength={20}
+            className="rounded-lg border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-neutral-400"
+          />
+          <input
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            placeholder="https://..."
+            inputMode="url"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            className="rounded-lg border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-neutral-400"
+          />
+        </div>
         <textarea
           value={desc}
           onChange={(e) => setDesc(e.target.value)}
           rows={3}
-          placeholder="메모 (주소, 비용, 링크 등)"
+          placeholder="메모"
           className="mb-3 w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-neutral-400"
         />
 
@@ -257,14 +307,37 @@ export default function CandidateCard({ candidate, selected, onSelect, onChanged
         {candidate.title || <span className="text-neutral-400">(제목 없음)</span>}
       </div>
 
-      {/* Time pill */}
-      {(candidate.start_time || candidate.end_time) && (
-        <div className="mb-2 inline-flex items-center gap-1.5 rounded-md bg-neutral-100 px-2 py-1 text-[11px] font-mono text-neutral-700">
-          <Clock className="h-3 w-3" />
-          {formatTime(candidate.start_time)}
-          {candidate.end_time ? ` ~ ${formatTime(candidate.end_time)}` : ""}
-        </div>
-      )}
+      {/* Time + Link row: time on the left, link button on the right */}
+      {(() => {
+        const hasTime = candidate.start_time || candidate.end_time;
+        const link = getLink(candidate.meta);
+        const hasLink = Boolean(link.url);
+        if (!hasTime && !hasLink) return null;
+        return (
+          <div className="mb-2 flex items-center gap-2">
+            {hasTime && (
+              <div className="inline-flex items-center gap-1.5 rounded-md bg-neutral-100 px-2 py-1 text-[11px] font-mono text-neutral-700">
+                <Clock className="h-3 w-3" />
+                {formatTime(candidate.start_time)}
+                {candidate.end_time ? ` ~ ${formatTime(candidate.end_time)}` : ""}
+              </div>
+            )}
+            {hasLink && link.url && (
+              <a
+                href={normalizeHref(link.url)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="ml-auto inline-flex max-w-[60%] items-center gap-1 truncate rounded-md bg-ocean-50 px-2 py-1 text-[11px] font-semibold text-ocean-700 ring-1 ring-ocean-200 transition hover:bg-ocean-100"
+                title={link.url}
+              >
+                <ExternalLink className="h-3 w-3 shrink-0" />
+                <span className="truncate">{link.label || "링크"}</span>
+              </a>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Description */}
       {candidate.description && (
